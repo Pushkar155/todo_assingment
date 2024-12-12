@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
-
-const Modal = ({ onSave, showModal, setShowModal }) => {
+const EditModal = ({ onSave, showModal2, setShowModal2, task }) => {
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    dueDate: "",
+    title: task.title,
+    description: task.description,
+    dueDate: task.dueDate,
   });
 
   const [errors, setErrors] = useState({});
@@ -38,8 +37,8 @@ const Modal = ({ onSave, showModal, setShowModal }) => {
 
   const handleSubmit = () => {
     if (validateForm()) {
-      onSave(formData);
-      setShowModal(!showModal);
+      onSave(task.id, formData);
+      console.log("Saving Task:", task.id, formData);
     }
   };
 
@@ -51,7 +50,7 @@ const Modal = ({ onSave, showModal, setShowModal }) => {
           <div className="border-[1px] flex justify-center items-center p-1 rounded-full border-gray-500 cursor-pointer hover:bg-gray-100">
             <CloseRoundedIcon
               style={{ fontSize: "15px" }}
-              onClick={() => setShowModal(!showModal)}
+              onClick={() => setShowModal2(!showModal2)}
             />
           </div>
         </div>
@@ -116,4 +115,4 @@ const Modal = ({ onSave, showModal, setShowModal }) => {
   );
 };
 
-export default Modal;
+export default EditModal;
