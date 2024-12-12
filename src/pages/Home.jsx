@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import { useTaskContext } from "../context/TaskContext";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import Modal from "../components/Modal";
+import EditModal from "../components/Editmodal";
 
 const Home = () => {
-  const { tasks, addTask, deleteTask, toggleTaskStatus } = useTaskContext();
+  const { tasks, addTask, deleteTask, toggleTaskStatus, updateTask } =
+    useTaskContext();
   const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [currenttask, setCurrenttask] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Completed");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("Ascending");
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 5;
@@ -15,6 +20,17 @@ const Home = () => {
   const onSave = (formData) => {
     addTask(formData);
     setShowModal(false);
+  };
+
+  const onSave2 = (id, formData) => {
+    updateTask(id, formData);
+    setShowModal2(false);
+  };
+
+  const handeledit = (task) => {
+    setShowModal2(!showModal2);
+    setCurrenttask(task);
+    console.log(currenttask);
   };
 
   const filteredTasks = tasks
@@ -36,16 +52,32 @@ const Home = () => {
   const indexOfFirstTask = indexOfLastTask - tasksPerPage;
   const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
 
-//   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  //   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);
 
   return (
     <div className="relative h-auto min-h-[100vh] w-full flex flex-col justify-start items-center bg-gray-900 text-white">
-      {showModal && <Modal onSave={onSave} showModal={showModal} setShowModal={setShowModal} />}
+      {showModal && (
+        <Modal
+          onSave={onSave}
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
+      )}
+      {showModal2 && (
+        <EditModal
+          onSave={onSave2}
+          showModal={showModal2}
+          setShowModal={setShowModal2}
+          task={currenttask}
+        />
+      )}
       {deleteIndex !== null && (
         <div className="absolute h-screen w-screen flex justify-center items-center backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg shadow-lg text-gray-800 flex flex-col justify-center items-center gap-4">
-            <p className="text-lg font-semibold">Are you sure you want to delete this task?</p>
+            <p className="text-lg font-semibold">
+              Are you sure you want to delete this task?
+            </p>
             <div className="flex gap-4 justify-end">
               <button
                 onClick={() => {
@@ -74,7 +106,9 @@ const Home = () => {
             "url('https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg')",
         }}
       >
-        <h1 className="font-semibold text-gray-50 text-3xl">Pushkar's Todo APP</h1>
+        <h1 className="font-semibold text-gray-50 text-3xl">
+          Pushkar's Todo APP
+        </h1>
         <div className="lg:w-[45%] bg-white text-gray-700 h-auto p-4 shadow-lg rounded-xl flex flex-col gap-4">
           <input
             type="text"
@@ -126,7 +160,9 @@ const Home = () => {
               }`}
             >
               <div>
-                <h3 className="font-semibold text-lg text-gray-600">{task.title}</h3>
+                <h3 className="font-semibold text-lg text-gray-600">
+                  {task.title}
+                </h3>
                 <p className="text-sm text-gray-600">{task.description}</p>
                 <p className="text-sm text-gray-500">{task.dueDate}</p>
               </div>
@@ -135,10 +171,14 @@ const Home = () => {
                   <input
                     type="checkbox"
                     checked={task.completed}
-                    onChange={() => toggleTaskStatus(globalIndex)} // Use globalIndex here
+                    onChange={() => toggleTaskStatus(task.id)} // Use globalIndex here
                     className="w-5 h-5 accent-green-500"
                   />
                 </label>
+                <EditRoundedIcon
+                  onClick={() => handeledit(task)}
+                  className="text-blue-500 cursor-pointer"
+                />
                 <button
                   onClick={() => setDeleteIndex(globalIndex)}
                   className="bg-red-500 px-4 py-2 text-white rounded-md"
@@ -158,7 +198,9 @@ const Home = () => {
           </button>
           <span className="text-white">{`Page ${currentPage} of ${totalPages}`}</span>
           <button
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            onClick={() =>
+              setCurrentPage(Math.min(totalPages, currentPage + 1))
+            }
             className="bg-blue-500 px-4 py-2 text-white rounded-md"
           >
             Next
